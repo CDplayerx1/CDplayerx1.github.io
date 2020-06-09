@@ -1,0 +1,195 @@
+# CDplayerx1.github.io
+<!DOCTYPE html>
+<html> 
+ <head>
+    <title>Circle Jumper</title> 
+</head>
+ <body>
+    <p> 
+	
+      <canvas id="mycanvas"></canvas> 
+    </p>
+ </body>
+ 
+
+ <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+ 
+ <script>
+    var sketchProc = function(processingInstance) {
+     with (processingInstance) {
+        size(1000, 500); 
+        frameRate(30);
+
+        //PART 2 GAME TIME
+         // 1. character
+         var sqr = function(x, y){
+         this.x = x;
+         this.y = y;
+         this.lives = 10;
+         };
+
+         //2.draw method
+         sqr.prototype.draw = function(){
+         this.y = constrain(this.y , 0, 450);
+         fill(255, 255, 0);
+         stroke(0, 0, 255);
+         ellipse(this.x, this.y, 60 , 60);
+         };
+
+         sqr.prototype.jump = function(){
+         fill(255, 255, 0);
+         stroke(0, 0, 255);
+         ellipse(this.x, this.y, 60 , 60);
+         this.y += 10;
+         };
+
+         sqr.prototype.fall = function(){
+         fill(255, 255, 0);
+         stroke(0, 0, 255);
+         ellipse(this.x, this.y, 60 , 60);
+         this.y -= 10;
+         };
+        
+
+         var sqr1 = new sqr(100, 400);
+
+         var greenXs = [];
+         for(var i = 0; i<55; i++){
+         greenXs.push(i*20);
+         };
+
+         bVal= []
+         for(var i =0; i<2000; i++){
+         var b =random(50,100);
+         bVal.push(b);
+         };
+         
+         var block = function(x, y, width, height){
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            };
+          block.prototype.draw = function(){
+            rectMode(CENTER);
+            fill(255, 255, 255);
+            stroke(0, 0, 0);
+            rect(this.x, this.y, 100,100 );
+          };
+          var blocks = [];
+          for( var i = 0; i<500; i++){
+             blocks.push(new block(i*290+(random(20, 275)), random(0, 250), bVal[i], bVal[i]));
+             blocks.push(new block(i*290+(random(20, 275)),random(250, 450), bVal[i], bVal[i]));
+          };
+
+          sqr.prototype.checkFT= function(block){
+            if(block.x>= this.x && block.x <= (this.x+70)&& block.y >= this.y && block.y <= (this.y+70)){
+               this.lives-=1;
+            }
+         };
+
+          drScene3 = function(){
+            background(0, 0, 0);
+            fill(255, 255, 255);
+            rectMode(CORNER);
+            rect(300, 100, 400,200);
+            fill(0, 0, 255);
+            textSize(50);
+            text("Game Over", 320, 150);
+          };
+
+          drScene4 = function(){
+            background(255, 255, 0);
+            fill(0, 100, 255);
+            rect(300, 100, 400, 200);
+            fill(255, 255,0);
+            textSize(50);
+            text("Congratulations", 320, 150);
+            text("level completed", 320, 200);
+          };
+
+         drscene2 = function(){
+            currentScene = 2;
+
+            //stationary background
+            noStroke();
+            background(227, 254, 255);
+            fill(130, 79, 43);
+            rect(0, height*0.90, width, height*0.10);
+
+            //grass movement
+            for(var i = 0; i < greenXs.length; i++){
+               fill(0, 255, 0);
+               stroke(0, 255, 0);
+               rect(greenXs[i], height*0.87, 20, 20);
+              
+               stroke(0, 0, 0);
+               line(greenXs[i],height*0.87, greenXs[i], height*0.87+20);
+               
+               greenXs[i] -=2;
+               if(greenXs[i] <= -20){
+                  greenXs[i] = width;
+               }
+               
+            }; 
+
+            textSize(30);
+            fill(255, 0, 0);
+           
+            for(var i=0; i<blocks.length; i++){
+               rectMode(CENTER);
+               blocks[i].draw();
+               sqr1.checkFT(blocks[i]);
+               blocks[i].x -= 10;
+            };
+            
+            
+            if(sqr1.lives<=0){
+               drScene3();
+            };
+            println(sqr1.lives);
+
+            if(keyPressed && keyCode === 32){
+               sqr1.jump();
+            }
+            else{
+               sqr1.fall();
+             }
+            sqr1.draw();
+         };
+
+         drScene1 = function(){
+            currentScene = 1;
+            background(0, 0, 0);
+            fill(225, 255, 175);
+            rect(300, 100, 400, 200);
+            fill(255, 0, 0);
+            textSize(50);
+            text("Circle Jumper", 350, 210);
+            fill(0, 0, 255);
+            rect(300, 300, 400, 50);
+            textSize(25);
+            fill(255, 255, 255);
+            text("click anywhere to start", 350, 330);
+         };
+         draw = function(){
+            if(currentScene ===2){
+               drscene2();
+            }
+         };
+         mouseClicked = function(){
+            if (currentScene ===1){
+            drscene2();
+            };
+         };
+         drScene1();
+
+      }};
+
+    // Get the canvas that Processing-js will use
+    var canvas = document.getElementById("mycanvas"); 
+    // Pass the function sketchProc (defined in myCode.js) to Processing's constructor.
+    var processingInstance = new Processing(canvas, sketchProc); 
+ </script>
+
+</html>
